@@ -68,6 +68,7 @@ INSTALLED_APPS = [
 
     'helper',
     'accounts',
+    'bulk_upload',
 ]
 
 MIDDLEWARE = [

@@ -12,6 +12,36 @@ user_t = lambda user :  model_to_dict(user, fields=['email', 'first_name', 'last
 
 # create serializers here. 
 
+class DetailDocumentSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='slug')
+    class Meta:
+        model = Document
+        fields = ['id']
+
+    def to_representation(self, instance : Document) -> Dict:
+        cols = instance.cols
+        entries = DocumentEntries.objects.filter(schema__document=instance).order_by('row_no')
+        
+        current_row, tmp, rows = 0, {}, []
+
+        for en in entries:
+            if current_row != en.row_no:
+                rows.append(dict(tmp))
+                tmp.clear()
+                current_row += 1
+            
+            tmp[en.schema.column_name] = en.data
+        
+        rows.append(tmp)
+
+        return {
+            'id': instance.slug,
+            'columns': cols.values_list('column_name', flat=True),
+            'created_at': instance.created_at,
+            'created_by': user_t(instance.created_by),
+            'rows': rows,
+        }
+
 class DocumentUploadSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='slug')
     file = serializers.FileField(validators=[
@@ -83,12 +113,12 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
             columns, entries = dict(), sheet.get('data')
             document_entries = [] # create objects for document entries for bulk insertion
 
-            for row in entries.values():
+            for index, row in enumerate(entries.values()):
                 for col, value in row.items():
                     if col not in columns:
                         # add the created schema object to columns
                         columns[col] = Schema.objects.create(document=document, column_name=col)
-                    document_entries.append(DocumentEntries(schema=columns.get(col), data=value))
+                    document_entries.append(DocumentEntries(schema=columns.get(col), data=value, row_no=index))
 
             DocumentEntries.objects.bulk_create(document_entries)
 

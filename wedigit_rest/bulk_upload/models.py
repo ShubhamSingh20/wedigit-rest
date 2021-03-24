@@ -30,4 +30,5 @@ class Schema(models.Model):
 
 class DocumentEntries(models.Model):
     schema = models.ForeignKey(Schema, on_delete=models.CASCADE)
+    row_no = models.PositiveSmallIntegerField()
     data = models.TextField()

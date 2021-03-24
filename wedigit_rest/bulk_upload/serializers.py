@@ -19,24 +19,12 @@ class DetailDocumentSerializer(serializers.ModelSerializer):
         fields = ['id']
 
     def to_representation(self, instance : Document) -> Dict:
-        cols = instance.cols
-        entries = DocumentEntries.objects.filter(schema__document=instance).order_by('row_no')
-        
-        current_row, tmp, rows = 0, {}, []
-
-        for en in entries:
-            if current_row != en.row_no:
-                rows.append(dict(tmp))
-                tmp.clear()
-                current_row += 1
-            
-            tmp[en.schema.column_name] = en.data
-        
-        rows.append(tmp)
+        entries, rows = DocumentEntries.objects.filter(document=instance), []
+        rows = [ {en.id: en.row_data.split('$#$')} for en in entries]
 
         return {
             'id': instance.slug,
-            'columns': cols.values_list('column_name', flat=True),
+            'columns': instance.cols.values_list('column_name', flat=True),
             'created_at': instance.created_at,
             'created_by': user_t(instance.created_by),
             'rows': rows,
@@ -114,11 +102,14 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
             document_entries = [] # create objects for document entries for bulk insertion
 
             for index, row in enumerate(entries.values()):
+                row_data = []
                 for col, value in row.items():
                     if col not in columns:
                         # add the created schema object to columns
                         columns[col] = Schema.objects.create(document=document, column_name=col)
-                    document_entries.append(DocumentEntries(schema=columns.get(col), data=value, row_no=index))
+                    row_data.append(str(value))
+
+                document_entries.append(DocumentEntries(document=document, row_data='$#$'.join(row_data)))
 
             DocumentEntries.objects.bulk_create(document_entries)
 

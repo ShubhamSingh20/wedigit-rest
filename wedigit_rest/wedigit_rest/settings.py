@@ -27,7 +27,10 @@ environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', str)
+if os.getenv('GITHUB_WORKFLOW'):
+    SECRET_KEY = os.getenv('SECRET_KEY')    
+else:
+    SECRET_KEY = env('SECRET_KEY', str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,8 +38,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=env('ACCESS_TOKEN_LIFE_TIME', int)),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=env('REFRESH_TOKEN_LIFE_TIME', int)),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 
     'ALGORITHM': 'HS256',
     'AUTH_HEADER_TYPES': ('Bearer',),

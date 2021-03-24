@@ -28,7 +28,7 @@ environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if os.getenv('GITHUB_WORKFLOW'):
-    SECRET_KEY = os.getenv('SECRET_KEY')    
+    SECRET_KEY = os.getenv('SECRET_KEY')
 else:
     SECRET_KEY = env('SECRET_KEY', str)
 

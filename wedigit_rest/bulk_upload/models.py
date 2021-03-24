@@ -13,12 +13,13 @@ class Document(ModelStamps):
         return Schema.objects.filter(document=self)
 
     @property
-    def total_rows(self):
+    def total_cols(self):
         return Schema.objects.filter(document=self).count()
 
     @property
-    def total_cols(self):
-        return DocumentEntries.objects.filter(schema__document=self).count()
+    def total_rows(self):
+        cols = self.cols
+        return DocumentEntries.objects.filter(schema__in=cols).count() // (cols.count() or 1)
 
     def __str__(self) -> str:
         return '%s' % self.file

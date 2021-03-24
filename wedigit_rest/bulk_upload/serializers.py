@@ -6,7 +6,7 @@ from django.forms.models import model_to_dict
 from django.core.validators import FileExtensionValidator
 import pandas as pd
 
-DocumentSchema = Dict['cols' : List, 'entry' : Dict]
+DocumentSchema = Dict
 
 user_t = lambda user :  model_to_dict(user, fields=['email', 'first_name', 'last_name']) \
     if user is not None else {}

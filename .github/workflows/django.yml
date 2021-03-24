@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+defaults:
+  run:
+    working-directory: wedigit-rest
+
 jobs:
   build:
 
@@ -26,6 +30,5 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests
-      working-directory: ./wedigit-rest
       run: |
         python manage.py test

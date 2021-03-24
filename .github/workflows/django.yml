@@ -29,6 +29,8 @@ jobs:
       env: 
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           GITHUB_WORKFLOW: 1
+          ACCESS_TOKEN_LIFE_TIME: 1
+          REFRESH_TOKEN_LIFE_TIME: 2
       run: |
         python manage.py test
       working-directory: wedigit_rest

@@ -17,8 +17,12 @@ Including another URLconf
 from django.urls import path
 from django.urls.conf import include
 
+from helper.views import ping
+
 urlpatterns = [
     path('api/v1/', include(([
         path('', include('accounts.urls')),
+        path('', include('bulk_upload.urls')),
+        path('ping/', ping, name='ping'),
     ], 'api'), namespace='api')),
 ]

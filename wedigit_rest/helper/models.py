@@ -14,7 +14,7 @@ class ModelStamps(models.Model):
         related_query_name="%(app_label)s_%(class)ss"
     )
     updated_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, 
+        User, on_delete=models.CASCADE,default=None, null=True,
         related_name="%(app_label)s_%(class)s_updated_by",
         related_query_name="%(app_label)s_%(class)ss"
     )

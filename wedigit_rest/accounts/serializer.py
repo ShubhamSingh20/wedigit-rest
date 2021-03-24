@@ -2,7 +2,6 @@ from typing import OrderedDict
 from accounts.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.validators import UnicodeUsernameValidator
 
 class UserSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='slug')

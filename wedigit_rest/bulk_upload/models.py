@@ -9,6 +9,10 @@ class Document(ModelStamps):
     slug = models.UUIDField(default=uuid4, editable=False)
 
     @property
+    def cols(self):
+        return Schema.objects.filter(document=self)
+
+    @property
     def total_rows(self):
         return Schema.objects.filter(document=self).count()
 

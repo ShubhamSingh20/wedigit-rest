@@ -13,12 +13,13 @@ class Document(ModelStamps):
         return Schema.objects.filter(document=self)
 
     @property
-    def total_rows(self):
+    def total_cols(self):
         return Schema.objects.filter(document=self).count()
 
     @property
-    def total_cols(self):
-        return DocumentEntries.objects.filter(schema__document=self).count()
+    def total_rows(self):
+        cols = self.cols
+        return DocumentEntries.objects.filter(document=self).count()
 
     def __str__(self) -> str:
         return '%s' % self.file
@@ -28,5 +29,5 @@ class Schema(models.Model):
     column_name = models.CharField(max_length=15)
 
 class DocumentEntries(models.Model):
-    schema = models.ForeignKey(Schema, on_delete=models.CASCADE)
-    data = models.TextField()
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    row_data = models.TextField()

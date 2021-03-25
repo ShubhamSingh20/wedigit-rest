@@ -18,6 +18,7 @@ class DocumentModelViewSet(CreateModelMixin,
                             DestroyModelMixin, 
                             GenericViewSet):
 
+    pagination_class = None
     lookup_field = 'slug'
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser, MultiPartParser, FormParser]

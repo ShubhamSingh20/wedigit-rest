@@ -53,6 +53,7 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
 
         return {
             'id': instance.slug,
+            'file_name': instance.file.name.split('/')[-1],
             'total_cols': cols.count(),
             'total_rows': instance.total_rows,
             'columns': cols.values_list('column_name', flat=True),

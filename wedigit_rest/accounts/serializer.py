@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueValidator
 
 class UserSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='slug')
-    last_name = serializers.CharField()
+    last_name = serializers.CharField(required=False)
     first_name = serializers.CharField()
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(validators=[

@@ -101,7 +101,7 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
             columns, entries = dict(), sheet.get('data')
             document_entries = [] # create objects for document entries for bulk insertion
 
-            for index, row in enumerate(entries.values()):
+            for row in entries.values():
                 row_data = []
                 for col, value in row.items():
                     if col not in columns:

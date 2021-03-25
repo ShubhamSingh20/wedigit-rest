@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from bulk_upload.serializers import DetailDocumentSerializer, DocumentUploadSerializer
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.mixins import (ListModelMixin, DestroyModelMixin, CreateModelMixin, RetrieveModelMixin)
 
@@ -38,50 +38,43 @@ class DocumentModelViewSet(CreateModelMixin,
     @action(detail=True, methods=['post'])
     def new_entry(self, request, slug):
         document = self.get_object()
-        cols = document.cols
-
-        if not any(set(cols.values_list('column_name', flat=True)).intersection(set(request.data.keys()))):
-            raise ValidationError({'error': ['all the fields are required']})
-
-        row, data = document.total_rows + 1, []
+        cols, data = document.cols, []
 
         for col in cols:
-            data.append(DocumentEntries(
-                schema=col, row_no=row, 
-                data=request.data.get(col.column_name)
-            ))
-        
+            if  not (value := request.data.get(col.column_name, False)):
+                raise ValidationError({'error': ['all the fields are required']})
+            data.append(str(value))
 
-        DocumentEntries.objects.bulk_create(data)
+        DocumentEntries.objects.create('#$#'.join(data))
 
         return Response(
             data=DetailDocumentSerializer(instance=document).data, 
             status=status.HTTP_201_CREATED
         )
 
-    @action(detail=True, methods=['patch'])
-    def update_entry(self, request, slug, row_no=None):
+    @action(detail=True, methods=['put'])
+    def update_entry(self, request, slug):
         document = self.get_object()
-        cols = document.cols
+        row_no = request.query_params.get('row_no', None)
+        
+        try:
+            entry = DocumentEntries.objects.get(document=document, id=row_no)
+        except DocumentEntries.DoesNotExist:
+            raise NotFound
 
-        if not any(set(cols.values_list('column_name', flat=True)).intersection(set(request.data.keys()))):
-            raise ValidationError({'error': ['all the fields are required']})
-
-        DocumentEntries.objects.filter(row_no=row_no, schema__in=document.cols).delete()
-
-        data = []
+        cols, data = document.cols, []
 
         for col in cols:
-            data.append(DocumentEntries(
-                schema=col, row_no=row_no, 
-                data=request.data.get(col.column_name)
-            ))
+            if  not (value := request.data.get(col.column_name, False)):
+                raise ValidationError({'error': ['all the fields are required']})
+            data.append(str(value))
 
-        DocumentEntries.objects.bulk_create(data)
+        entry.row_data = '#$#'.join(entry)
+        entry.save()
 
         return Response(
             data=DetailDocumentSerializer(instance=document).data, 
-            status=status.status.HTTP_200_OK
+            status=status.HTTP_200_OK
         )
 
     @action(detail=True, methods=['delete'])

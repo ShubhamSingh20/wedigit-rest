@@ -1,0 +1,22 @@
+name: Deploy workflow
+on:
+  push: 
+    branches: [ main ]
+
+jobs: 
+  job_one:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DIGITAL_OCEAN_DROPLET }}
+          username: root
+          key: ${{ secrets.DIGITAL_OCEAN_SECRET }}
+          port: 22
+          script: |
+            cd backend
+            git pull origin main
+            git status
+

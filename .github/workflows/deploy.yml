@@ -13,7 +13,7 @@ jobs:
         with:
           host: ${{ secrets.DIGITAL_OCEAN_DROPLET }}
           username: root
-          key: ${{ secrets.DIGITAL_OCEAN_SECRET }}
+          password: ${{ secrets.DIGITAL_OCEAN_PASSWORD }}
           port: 22
           script: |
             cd backend

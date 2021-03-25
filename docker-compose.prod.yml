@@ -3,7 +3,7 @@ version: '3.7'
 services:
   web:
     build:
-      context: ./wedigit_rest
+      context: ./backend
       dockerfile: Dockerfile.prod
     command: gunicorn wedigit_rest.wsgi:application --bind 0.0.0.0:8000
     ports:
